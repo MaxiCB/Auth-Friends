@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const port = 5000;
+const port = 3333;
+
 const app = express();
 const token =
   'esfeyJ1c2VySWQiOiJiMDhmODZhZi0zNWRhLTQ4ZjItOGZhYi1jZWYzOTA0NUIhkufemQifQ';
@@ -48,6 +49,7 @@ let friends = [
 ];
 
 app.use(bodyParser.json());
+// app.use(express.json());
 
 app.use(cors());
 
@@ -60,7 +62,7 @@ function authenticator(req, res, next) {
   }
 }
 
-app.post('/api/login', (req, res) => {
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (username === 'Lambda School' && password === 'i<3Lambd4') {
     req.loggedIn = true;
@@ -74,13 +76,13 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-app.get('/api/friends', authenticator, (req, res) => {
+app.get('/friends', authenticator, (req, res) => {
   setTimeout(() => {
     res.send(friends);
   }, 1000);
 });
 
-app.get('/api/friends/:id', authenticator, (req, res) => {
+app.get('/friends/:id', authenticator, (req, res) => {
   const friend = friends.find(f => f.id == req.params.id);
 
   if (friend) {
@@ -90,7 +92,7 @@ app.get('/api/friends/:id', authenticator, (req, res) => {
   }
 });
 
-app.post('/api/friends', authenticator, (req, res) => {
+app.post('/friends', authenticator, (req, res) => {
   const friend = { id: getNextId(), ...req.body };
 
   friends = [...friends, friend];
@@ -98,7 +100,7 @@ app.post('/api/friends', authenticator, (req, res) => {
   res.send(friends);
 });
 
-app.put('/api/friends/:id', authenticator, (req, res) => {
+app.put('/friends/:id', authenticator, (req, res) => {
   const { id } = req.params;
 
   const friendIndex = friends.findIndex(f => f.id == id);
@@ -117,7 +119,7 @@ app.put('/api/friends/:id', authenticator, (req, res) => {
   }
 });
 
-app.delete('/api/friends/:id', authenticator, (req, res) => {
+app.delete('/friends/:id', authenticator, (req, res) => {
   const { id } = req.params;
 
   friends = friends.filter(f => f.id !== Number(id));
@@ -129,6 +131,7 @@ function getNextId() {
   return nextId++;
 }
 
-app.listen(port, () => {
+app.listen(port, err => {
+  if(err) console.log(err);
   console.log(`server listening on port ${port}`);
 });
